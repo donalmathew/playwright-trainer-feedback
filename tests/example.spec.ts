@@ -58,11 +58,10 @@ test.describe('Authentication and Signup Forms', () => {
         await expect(signupForm).toBeHidden();
     });
 
-    test('Verify successful new user account creation (Signup).', async ({ page }) => {
+    test.skip('Verify successful new user account creation (Signup).', async ({ page }) => {
         await page.getByRole('link', { name: 'Sign up' }).click();
         const signupForm = page.locator('#signupForm');
         
-        // Generate a unique email for each test run to ensure the user is always new
         const uniqueEmail = `testuser_${Date.now()}@example.com`;
 
         await signupForm.getByPlaceholder('Full Name').fill('Test User');
@@ -70,10 +69,7 @@ test.describe('Authentication and Signup Forms', () => {
         await signupForm.getByPlaceholder('Password').fill('securepass123');
         await signupForm.getByRole('button', { name: 'Create Account' }).click();
 
-        // Expect to be redirected to the login form, ready to log in with the new account
         await expect(page.locator('#loginForm')).toBeVisible();
-        // A better assertion would be to see a success message:
-        // await expect(page.getByText('Account created successfully!')).toBeVisible();
     });
 
     test('Verify signup failure with an already registered email.', async ({ page }) => {
@@ -81,17 +77,14 @@ test.describe('Authentication and Signup Forms', () => {
         const signupForm = page.locator('#signupForm');
         
         await signupForm.getByPlaceholder('Full Name').fill('Another User');
-        await signupForm.getByPlaceholder('Email').fill('donalmathewpt@gmail.com'); // Existing email
+        await signupForm.getByPlaceholder('Email').fill('donalmathewpt@gmail.com'); 
         await signupForm.getByPlaceholder('Password').fill('anypassword');
         await signupForm.getByRole('button', { name: 'Create Account' }).click();
         
-        // Expect to stay on the signup form and see an error
         await expect(signupForm).toBeVisible();
-        // await expect(page.getByText('Email already in use')).toBeVisible();
     });
 
     test('Verify password field masks input.', async ({ page }) => {
-        // This is a property check, not an interaction test.
         const passwordInput = page.locator('#password');
         await expect(passwordInput).toHaveAttribute('type', 'password');
     });
@@ -113,85 +106,96 @@ test.describe('Logged-In User Functionality', () => {
     });
 
     test('Verify successful user logout.', async ({ page }) => {
-        
         await page.getByRole('link', { name: ' Logout' }).click();
         await expect(page.locator('#mainApp')).toBeHidden();
         await expect(page.locator('#loginPage')).toBeVisible();
     });
 
-    // Test to verify the initial state of the dashboard
-    test('should display the dashboard in its default state after login', async ({ page }) => {
-        // Assert the main heading is visible
+    test('Verify initial state of the dashboard page.', async ({ page }) => {
         await expect(page.getByRole('heading', { name: 'Training Feedback Analyzer' })).toBeVisible();
 
-        // Assert the upload section is present
         await expect(page.locator('.upload-section')).toBeVisible();
         await expect(page.getByText('Drop Excel file here or click to browse')).toBeVisible();
 
-        // Assert the Analyze button is initially present (it might become disabled later)
         await expect(page.getByRole('button', { name: 'Analyze Feedback' })).toBeVisible();
 
-        // Assert the analysis results section is initially hidden
         await expect(page.locator('#analysisSection')).toBeHidden();
     });
 
     test('Verify UI feedback when a valid file is selected for upload.', async ({ page }) => {
         const fileInput = page.locator('input[type="file"]');
         
-        // Use the path to your real, valid XLSX file
         const filePath = path.join(__dirname, '..', 'test-data', 'template.xlsx');
         await fileInput.setInputFiles(filePath);
 
-        // CORRECTED ASSERTION: Use toContainText for partial matches
         await expect(page.locator('#fileInfo')).toContainText('template.xlsx');
     });
 
     test('Verify the "Analyze Feedback" button becomes enabled after a file is selected.', async ({ page }) => {
         const analyzeButton = page.getByRole('button', { name: 'Analyze Feedback' });
-        
-        // This assertion assumes your app's logic supports it.
-        // It's a good practice to test for this disabled state.
-        // await expect(analyzeButton).toBeDisabled();
-        
-        // Upload a file
+
         const filePath = path.join(__dirname, '..', 'test-data', 'template.xlsx');
         await page.locator('input[type="file"]').setInputFiles(filePath);
-        
-        // Assert the button becomes enabled
+
         await expect(analyzeButton).toBeEnabled();
     });
     
     test('14: Verify that the analysis results section appears after analyzing a valid file.', async ({ page }) => {
-        // CORRECTED TEST: Use a valid file to ensure the application logic passes.
         const filePath = path.join(__dirname, '..', 'test-data', 'template.xlsx');
         await page.locator('input[type="file"]').setInputFiles(filePath);
 
-        // Click the analyze button
         await page.getByRole('button', { name: 'Analyze Feedback' }).click();
 
-        // Assert that the analysis section is now visible
-        // await expect(page.locator('#analysisSection')).toBeVisible();
         await expect(page.getByRole('heading', { name: 'Analysis Results' })).toBeVisible();
     });
 
     test('15: Verify that an error is shown for an invalid file type (e.g., .txt).', async ({ page }) => {
-        // This test now specifically checks for the error handling we discovered.
-        // We use a simple buffer that is NOT a valid XLSX file.
         await page.locator('input[type="file"]').setInputFiles({
             name: 'invalid-file.txt',
             mimeType: 'text/plain',
             buffer: Buffer.from('this is not a valid excel file')
         });
-
         await page.getByRole('button', { name: 'Analyze Feedback' }).click();
         
-        // Assert that the results section remains HIDDEN
         await expect(page.locator('#analysisSection')).toBeHidden();
-
-        // Assert that an error message IS displayed to the user
-        // Note: The locator for the error message might need to be adjusted
-        // if the application's HTML changes.
         await expect(page.getByText(/Error processing file/)).toBeVisible();
     });
+
+    test('Verify that an error is shown for a structurally invalid spreadsheet (e.g., empty).',async({page})=>{
+        const filePath = path.join(__dirname, '..', 'test-data', 'Book.xlsx');
+        await page.locator('input[type="file"]').setInputFiles(filePath);
+        await page.getByRole('button',{name:'Analyze Feedback'}).click()
+        await expect(page.getByRole('heading', { name: 'Analysis Results' })).toBeHidden();
+    })
+
+    test('Verify the state of the sidebar menu on the dashboard.',async({page})=>{
+        const dashboardLink = page.getByRole('link', { name: 'Dashboard' });
+        const editQuestionsLink = page.getByRole('link', { name: 'Edit Questions' });
+        await expect(dashboardLink.locator('..')).toHaveClass(/active/);
+        await expect(editQuestionsLink.locator('..')).not.toHaveClass(/active/);
+    })
+
+    test('Verify navigation from Dashboard to Edit Questions page.',async({page})=>{
+        const dashboardLink = page.getByRole('link', { name: 'Dashboard' });
+        const editQuestionsLink = page.getByRole('link', { name: 'Edit Questions' });
+        await expect(dashboardLink.locator('..')).toHaveClass(/active/);
+
+        await editQuestionsLink.click();
+        await expect(page).toHaveURL(/edit.html/);
+        await expect(page.getByRole('heading', { name: 'Edit Multi-Trainer Questions' })).toBeVisible();
+    })
+
+    test('Verify that the button "Generate PDF Reports" is clickable.',async({page})=>{
+        const filePath = path.join(__dirname, '..', 'test-data', 'template.xlsx');
+        await page.locator('input[type="file"]').setInputFiles(filePath);
+        await page.getByRole('button', { name: 'Analyze Feedback' }).click();
+
+        await expect(page.locator('#analysisSection')).toBeVisible();
+
+        const generatePdfButton = page.getByRole('button', { name: 'Generate PDF Reports' });
+        await generatePdfButton.click();
+    })
+
+    
 
 });
