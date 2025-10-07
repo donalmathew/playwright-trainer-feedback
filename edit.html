@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Questions</title>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="edit.js"></script>
+  </head>
+  <body>
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3>Navigation</h3>
+      </div>
+      <ul class="sidebar-menu">
+        <li>
+          <a href="index1.html"><i class="icon">📊</i> Dashboard</a>
+        </li>
+        <li class="active">
+          <a href="edit.html"><i class="icon">✏️</i> Edit Questions</a>
+        </li>
+        <li class="logout">
+          <a href="#" onclick="handleLogout()"><i class="icon">🚪</i> Logout</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="main-content">
+      <div class="container">
+        <h1>Edit Multi-Trainer Questions</h1>
+        <div id="questionList"></div>
+        <button id="saveQuestionsBtn" class="btn">Save Changes</button>
+        <p id="saveStatus" style="margin-top: 10px; display: none"></p>
+      </div>
+    </div>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="edit.js"></script>
+  </body>
+</html>

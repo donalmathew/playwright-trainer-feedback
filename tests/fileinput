@@ -1,0 +1,36 @@
+// import { test, expect } from '@playwright/test';
+// import path from 'path';
+
+// test.beforeEach(async ({ page }) => {
+//   await page.goto('http://localhost:5500/index.html'); // adjust path/port
+// });
+
+// // helper: simulate login first (since upload section is in mainApp)
+// async function login(page) {
+//   await page.locator('#username').fill('donalmathewpt@gmail.com');
+//   await page.locator('#password').fill('333333');
+//   await page.getByRole('button', { name: 'Login' }).click();
+//   await expect(page.locator('#mainApp')).toBeVisible();
+// }
+
+// test('File upload and analyze button', async ({ page }) => {
+//   await login(page);
+
+//   // locate file input
+//   const fileInput = page.locator('#fileInput');
+
+//   // path to a dummy excel file in your project tests/fixtures folder
+//   const filePath = path.resolve(__dirname, 'fixtures', 'sample.xlsx');
+
+//   // upload file
+//   await fileInput.setInputFiles(filePath);
+
+//   // assert fileInfo updated (depends on your JS, adjust if needed)
+//   await expect(page.locator('#fileInfo')).toContainText('sample.xlsx');
+
+//   // click Analyze button
+//   await page.getByRole('button', { name: 'Analyze Feedback' }).click();
+
+//   // check that analysis section is visible
+//   await expect(page.locator('#analysisSection')).toBeVisible();
+// });

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Training Feedback Analyzer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+      <div class="login-box">
+        <h2>Login</h2>
+        <form id="loginForm">
+          <div class="form-group">
+            <input type="text" id="username" placeholder="Username" required />
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              required
+            />
+          </div>
+          <div>
+            <button type="submit" class="btn">Login</button>
+          </div>
+        </form>
+
+        <p style="text-align: center; margin-top: 10px">
+          Don’t have an account?
+          <a href="#" id="showSignup">Sign up</a>
+        </p>
+
+        <!-- Hidden signup form -->
+        <form id="signupForm" style="display: none; margin-top: 20px">
+          <div class="form-group">
+            <input
+              type="text"
+              id="signupName"
+              placeholder="Full Name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input type="email" id="signupEmail" placeholder="Email" required />
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="signupPassword"
+              placeholder="Password"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <!-- <select id="signupRole" required>
+              <option value="">Select Role</option>
+              <option value="admin">Admin</option>
+              <option value = "trainer">Trainer</optoin>
+            </select> -->
+          </div>
+          <div>
+            <button type="submit" class="btn">Create Account</button>
+          </div>
+          <p style="text-align: center; margin-top: 10px">
+            Already have an account? <a href="#" id="showLogin">Login</a>
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Main Application (Hidden until login) -->
+    <div id="mainApp" class="main-app" style="display: none">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h3>Navigation</h3>
+        </div>
+        <ul class="sidebar-menu">
+          <li class="active">
+            <a href="#dashboard"><i class="icon">📊</i> Dashboard</a>
+          </li>
+          <!-- <li>
+            <a href="#reports"><i class="icon">📄</i> Reports</a>
+          </li>
+          <li>
+            <a href="#settings"><i class="icon">⚙️</i> Settings</a>
+          </li> -->
+          <li>
+            <a href="edit.html"><i class="icon">✏️</i> Edit Questions</a>
+          </li>
+          <li class="logout">
+            <a href="#" onclick="handleLogout()"
+              ><i class="icon">🚪</i> Logout</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="container">
+          <div class="header">
+            <h1>Training Feedback Analyzer</h1>
+            <p>
+              Upload Excel files to generate comprehensive trainer feedback
+              reports
+            </p>
+          </div>
+
+          <div class="upload-section">
+            <div
+              class="upload-area"
+              onclick="document.getElementById('fileInput').click()"
+            >
+              <div class="upload-icon">📊</div>
+              <div class="upload-text">
+                Drop Excel file here or click to browse
+              </div>
+              <div class="upload-subtext">Supports .xlsx and .xls formats</div>
+            </div>
+            <input type="file" id="fileInput" accept=".xlsx,.xls" />
+            <button id="analyzeBtn" class="btn">Analyze Feedback</button>
+            <div id="fileInfo"></div>
+          </div>
+
+          <div class="analysis-section" id="analysisSection">
+            <h2>Analysis Results</h2>
+            <div id="analysisResults"></div>
+            <div class="generate-section">
+              <button class="btn" id="generateBtn">Generate PDF Reports</button>
+              <div class="progress" id="progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p>
+                  Generating reports...
+                  <span class="loading"><span class="spinner"></span></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analysis-section" id="questionEditor" style="display: none">
+          <h2>Edit Multi-Trainer Questions</h2>
+          <div id="questionList"></div>
+          <button id="saveQuestionsBtn" class="btn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+    <script type="module">
+      import {
+        saveTrainerFeedback,
+        getAllTrainerFeedback,
+      } from "./firebase.js";
+      window.saveTrainerFeedback = saveTrainerFeedback;
+      window.getAllTrainerFeedback = getAllTrainerFeedback;
+    </script>
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="edit.js"></script>
+    <script type="module" src="login.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
