@@ -29,7 +29,6 @@ test.describe('Authentication and Signup Forms', () => {
         await loginForm.getByPlaceholder('Username').fill('wrong@user.com');
         await loginForm.getByPlaceholder('Password').fill('333333');
         await loginForm.getByRole('button', { name: 'Login' }).click();
-        
         await expect(page.locator('#mainApp')).toBeHidden();
     });
 
