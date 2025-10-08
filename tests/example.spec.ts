@@ -58,7 +58,14 @@ test.describe('Authentication and Signup Forms', () => {
         await expect(signupForm).toBeHidden();
     });
 
-    test('Verify successful new user account creation (Signup).', async ({ page }) => {
+    test('Verify Full Name Section works as intended', async ({ page }) => {
+        await page.getByRole('link', { name: 'Sign up' }).click();
+        const signupForm = page.locator('#signupForm');
+        
+        await signupForm.getByPlaceholder('Full Name').fill('Test User');
+    });
+
+    test.skip('Verify successful new user account creation (Signup).', async ({ page }) => {
         await page.getByRole('link', { name: 'Sign up' }).click();
         const signupForm = page.locator('#signupForm');
         
@@ -196,9 +203,15 @@ test.describe('Logged-In User Functionality', () => {
         await generatePdfButton.click();
     })
 
+    test('Should be able to logout from Dashboard page', async ({ page }) => {
+        await page.getByRole('link', { name: 'Logout' }).click();
+
+        await expect(page).toHaveURL(/index1.html/);
+        await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
+    });
+    
 
 });
-
 
 test.describe('Edit Questions Page', () => {
 

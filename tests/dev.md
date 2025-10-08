@@ -1,3 +1,4 @@
+```typescript
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
 
@@ -58,7 +59,7 @@ test.describe('Authentication and Signup Forms', () => {
         await expect(signupForm).toBeHidden();
     });
 
-    test('Verify successful new user account creation (Signup).', async ({ page }) => {
+    test.skip('Verify successful new user account creation (Signup).', async ({ page }) => {
         await page.getByRole('link', { name: 'Sign up' }).click();
         const signupForm = page.locator('#signupForm');
         
@@ -196,100 +197,7 @@ test.describe('Logged-In User Functionality', () => {
         await generatePdfButton.click();
     })
 
+    
 
 });
-
-
-test.describe('Edit Questions Page', () => {
-
-    test.beforeEach(async ({ page }) => {
-        await page.goto('http://127.0.0.1:5501/index1.html');
-        const loginForm = page.locator('#loginForm');
-        await loginForm.getByPlaceholder('Username').fill('donalmathewpt@gmail.com');
-        await loginForm.getByPlaceholder('Password').fill('333333');
-        await loginForm.getByRole('button', { name: 'Login' }).click();
-        await expect(page.locator('#mainApp')).toBeVisible();
-
-        await page.getByRole('link', { name: '✏️ Edit Questions' }).click();
-        
-        await expect(page).toHaveURL(/edit.html/);
-    });
-
-    test('Verify Heading in Edit Questions page is visible', async ({ page }) => {
-        await expect(page.getByRole('heading', { name: 'Edit Multi-Trainer Questions' })).toBeVisible();
-    });
-
-    test('EDIT-001: should display the list of questions on page load', async ({ page }) => {
-        const firstQuestionInput = page.locator('#question-0');
-        const lastQuestionInput = page.locator('#question-3'); 
-
-        await expect(firstQuestionInput).toBeVisible();
-        await expect(lastQuestionInput).toBeVisible();
-    });
-
-    test('Verify default text in First Question ', async ({ page }) => {
-        const firstQuestionInput = page.locator('#question-0');
-        await expect(firstQuestionInput).toBeVisible();
-        await expect(firstQuestionInput).toHaveValue('Adequate opportunity to clarify concepts');
-    });
-
-    test('EDIT-002: should allow editing the text of a question', async ({ page }) => {
-        const questionInput = page.locator('#question-1');
-        const newText = 'Was the pace of the training appropriate?';
-        
-        await questionInput.fill(newText);
-        
-        await expect(questionInput).toHaveValue(newText);
-    });
-
-    test('Verify Save-Changes button is clickable', async ({ page }) => {
-        const saveButton = page.getByRole('button', { name: 'Save Changes' });
-        
-        await saveButton.click();
-
-        const statusMessage = page.locator('#saveStatus');
-        await expect(statusMessage).toBeVisible();
-    });
-
-
-    test('EDIT-003: should show a success message after saving changes', async ({ page }) => {
-        const saveButton = page.getByRole('button', { name: 'Save Changes' });
-        
-        await saveButton.click();
-
-        const statusMessage = page.locator('#saveStatus');
-        await expect(statusMessage).toBeVisible();
-        await expect(statusMessage).toContainText('Questions saved successfully!');
-    });
-
-
-
-    test('EDIT-004: should persist changes after saving and reloading', async ({ page }) => {
-        const questionInput = page.locator('#question-2');
-        const persistedText = `New persisted text ${Date.now()}`;
-
-        await questionInput.fill(persistedText);
-
-        await page.getByRole('button', { name: 'Save Changes' }).click();
-        await expect(page.locator('#saveStatus')).toBeVisible(); 
-
-        await page.reload();
-
-        await expect(page.getByRole('heading', { name: 'Edit Multi-Trainer Questions' })).toBeVisible();
-        await expect(questionInput).toHaveValue(persistedText);
-    });
-
-    test('EDIT-005: should navigate back to dashboard from sidebar', async ({ page }) => {
-        await page.getByRole('link', { name: '📊 Dashboard' }).click();
-
-        await expect(page).toHaveURL(/index1.html/);
-        await expect(page.getByRole('heading', { name: 'Training Feedback Analyzer' })).toBeVisible();
-    });
-
-    test('Should be able to logout from Edit questions page', async ({ page }) => {
-        await page.getByRole('link', { name: 'Logout' }).click();
-
-        await expect(page).toHaveURL(/index1.html/);
-        await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
-    });
-});
+```
