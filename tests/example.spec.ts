@@ -58,7 +58,7 @@ test.describe('Authentication and Signup Forms', () => {
         await expect(signupForm).toBeHidden();
     });
 
-    test.skip('Verify successful new user account creation (Signup).', async ({ page }) => {
+    test('Verify successful new user account creation (Signup).', async ({ page }) => {
         await page.getByRole('link', { name: 'Sign up' }).click();
         const signupForm = page.locator('#signupForm');
         
@@ -196,6 +196,7 @@ test.describe('Logged-In User Functionality', () => {
         await generatePdfButton.click();
     })
 
+
 });
 
 
@@ -241,6 +242,16 @@ test.describe('Edit Questions Page', () => {
         await expect(questionInput).toHaveValue(newText);
     });
 
+    test('Verify Save-Changes button is clickable', async ({ page }) => {
+        const saveButton = page.getByRole('button', { name: 'Save Changes' });
+        
+        await saveButton.click();
+
+        const statusMessage = page.locator('#saveStatus');
+        await expect(statusMessage).toBeVisible();
+    });
+
+
     test('EDIT-003: should show a success message after saving changes', async ({ page }) => {
         const saveButton = page.getByRole('button', { name: 'Save Changes' });
         
@@ -250,6 +261,8 @@ test.describe('Edit Questions Page', () => {
         await expect(statusMessage).toBeVisible();
         await expect(statusMessage).toContainText('Questions saved successfully!');
     });
+
+
 
     test('EDIT-004: should persist changes after saving and reloading', async ({ page }) => {
         const questionInput = page.locator('#question-2');
@@ -271,5 +284,12 @@ test.describe('Edit Questions Page', () => {
 
         await expect(page).toHaveURL(/index1.html/);
         await expect(page.getByRole('heading', { name: 'Training Feedback Analyzer' })).toBeVisible();
+    });
+
+    test('Should be able to logout from Edit questions page', async ({ page }) => {
+        await page.getByRole('link', { name: 'Logout' }).click();
+
+        await expect(page).toHaveURL(/index1.html/);
+        await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
     });
 });
