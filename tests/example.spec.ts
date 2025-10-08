@@ -335,7 +335,15 @@ test.describe('Edit Questions Page', () => {
     //     await expect(statusMessage).toContainText('Questions saved successfully!');
     // });
 
+    test.only('Should show a success message after saving changes', async ({ page }) => {
+        const saveButton = page.getByRole('button', { name: 'Save Changes' });
 
+        const statusMessage = page.locator('#saveStatus');
+        await expect(statusMessage).toBeHidden();
+        await saveButton.click();
+
+        await expect(statusMessage).toBeVisible({ timeout: 2000 });
+    });
 
 
 
