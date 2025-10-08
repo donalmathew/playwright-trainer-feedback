@@ -118,16 +118,31 @@ test.describe('Logged-In User Functionality', () => {
         await expect(page.locator('#loginPage')).toBeVisible();
     });
 
-    test('Verify initial state of the dashboard page.', async ({ page }) => {
+
+    // test('Verify initial state of the dashboard page.', async ({ page }) => {
+    //     await expect(page.getByRole('heading', { name: 'Training Feedback Analyzer' })).toBeVisible();
+
+    //     await expect(page.locator('.upload-section')).toBeVisible();
+    //     await expect(page.getByText('Drop Excel file here or click to browse')).toBeVisible();
+
+    //     await expect(page.getByRole('button', { name: 'Analyze Feedback' })).toBeVisible();
+
+    //     await expect(page.locator('#analysisSection')).toBeHidden();
+    // });
+
+    test('Verify Dashboard heading and Upload section is visible', async ({ page }) => {
         await expect(page.getByRole('heading', { name: 'Training Feedback Analyzer' })).toBeVisible();
 
         await expect(page.locator('.upload-section')).toBeVisible();
         await expect(page.getByText('Drop Excel file here or click to browse')).toBeVisible();
+    });
 
+    test('Verify Analyze Feedback section is visible and Analysis Section is hidden', async ({ page }) => {
         await expect(page.getByRole('button', { name: 'Analyze Feedback' })).toBeVisible();
 
         await expect(page.locator('#analysisSection')).toBeHidden();
     });
+
 
     test('Verify UI feedback when a valid file is selected for upload.', async ({ page }) => {
         const fileInput = page.locator('input[type="file"]');
@@ -136,6 +151,23 @@ test.describe('Logged-In User Functionality', () => {
         await fileInput.setInputFiles(filePath);
 
         await expect(page.locator('#fileInfo')).toContainText('template.xlsx');
+    });
+
+    test('UI-001: should allow file upload via drag-and-drop', async ({ page }) => {
+        const uploadArea = page.locator('.upload-area');
+        const fileInfo = page.locator('#fileInfo');
+        const filePath = path.join(__dirname, '..', 'test-data', 'template.xlsx');
+
+        const dataTransfer = await page.evaluateHandle((filePath) => {
+            const data = new DataTransfer();
+            const file = new File([''], filePath, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            data.items.add(file);
+            return data;
+        }, filePath);
+
+        await uploadArea.dispatchEvent('drop', { dataTransfer });
+        
+        await expect(fileInfo).toContainText('template.xlsx');
     });
 
     test('Verify the "Analyze Feedback" button becomes enabled after a file is selected.', async ({ page }) => {
@@ -265,7 +297,7 @@ test.describe('Edit Questions Page', () => {
     });
 
 
-    test('EDIT-003: should show a success message after saving changes', async ({ page }) => {
+    test('Should show a success message after saving changes', async ({ page }) => {
         const saveButton = page.getByRole('button', { name: 'Save Changes' });
         
         await saveButton.click();
@@ -277,7 +309,7 @@ test.describe('Edit Questions Page', () => {
 
 
 
-    test('EDIT-004: should persist changes after saving and reloading', async ({ page }) => {
+    test('Should persist changes after saving and reloading', async ({ page }) => {
         const questionInput = page.locator('#question-2');
         const persistedText = `New persisted text ${Date.now()}`;
 
@@ -292,7 +324,7 @@ test.describe('Edit Questions Page', () => {
         await expect(questionInput).toHaveValue(persistedText);
     });
 
-    test('EDIT-005: should navigate back to dashboard from sidebar', async ({ page }) => {
+    test('Should navigate back to dashboard from sidebar', async ({ page }) => {
         await page.getByRole('link', { name: '📊 Dashboard' }).click();
 
         await expect(page).toHaveURL(/index1.html/);
