@@ -149,18 +149,6 @@ test.describe('Logged-In User Functionality', () => {
         await expect(page.locator('#loginPage')).toBeVisible();
     });
 
-
-    // test('Verify initial state of the dashboard page.', async ({ page }) => {
-    //     await expect(page.getByRole('heading', { name: 'Training Feedback Analyzer' })).toBeVisible();
-
-    //     await expect(page.locator('.upload-section')).toBeVisible();
-    //     await expect(page.getByText('Drop Excel file here or click to browse')).toBeVisible();
-
-    //     await expect(page.getByRole('button', { name: 'Analyze Feedback' })).toBeVisible();
-
-    //     await expect(page.locator('#analysisSection')).toBeHidden();
-    // });
-
     test('Verify Dashboard heading and Upload section is visible', async ({ page }) => {
         await expect(page.getByRole('heading', { name: 'Training Feedback Analyzer' })).toBeVisible();
 
@@ -184,20 +172,19 @@ test.describe('Logged-In User Functionality', () => {
         await expect(page.locator('#fileInfo')).toContainText('template.xlsx');
     });
 
-    test('UI-001: should allow file upload via drag-and-drop', async ({ page }) => {
+    test('Verify file upload via drag-and-drop is allowed', async ({ page }) => {
         const uploadArea = page.locator('.upload-area');
         const fileInfo = page.locator('#fileInfo');
         const filePath = path.join(__dirname, '..', 'test-data', 'template.xlsx');
-
         const dataTransfer = await page.evaluateHandle((filePath) => {
             const data = new DataTransfer();
-            const file = new File([''], filePath, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const file = new File([''], filePath, 
+                { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             data.items.add(file);
             return data;
         }, filePath);
 
         await uploadArea.dispatchEvent('drop', { dataTransfer });
-        
         await expect(fileInfo).toContainText('template.xlsx');
     });
 
@@ -210,7 +197,7 @@ test.describe('Logged-In User Functionality', () => {
         await expect(analyzeButton).toBeEnabled();
     });
     
-    test('14: Verify that the analysis results section appears after analyzing a valid file.', async ({ page }) => {
+    test('Verify that the analysis results section appears after analyzing a valid file.', async ({ page }) => {
         const filePath = path.join(__dirname, '..', 'test-data', 'template.xlsx');
         await page.locator('input[type="file"]').setInputFiles(filePath);
 
@@ -219,14 +206,13 @@ test.describe('Logged-In User Functionality', () => {
         await expect(page.getByRole('heading', { name: 'Analysis Results' })).toBeVisible();
     });
 
-    test('15: Verify that an error is shown for an invalid file type (e.g., .txt).', async ({ page }) => {
+    test('Verify that an error is shown for an invalid file type (e.g., .txt).', async ({ page }) => {
         await page.locator('input[type="file"]').setInputFiles({
             name: 'invalid-file.txt',
             mimeType: 'text/plain',
             buffer: Buffer.from('this is not a valid excel file')
         });
         await page.getByRole('button', { name: 'Analyze Feedback' }).click();
-        
         await expect(page.locator('#analysisSection')).toBeHidden();
         await expect(page.getByText(/Error processing file/)).toBeVisible();
     });
@@ -266,7 +252,7 @@ test.describe('Logged-In User Functionality', () => {
         await generatePdfButton.click();
     })
 
-    test('Should be able to logout from Dashboard page', async ({ page }) => {
+    test('Verify logout is possible from Dashboard page', async ({ page }) => {
         await page.getByRole('link', { name: 'Logout' }).click();
 
         await expect(page).toHaveURL(/index1.html/);
@@ -295,7 +281,7 @@ test.describe('Edit Questions Page', () => {
         await expect(page.getByRole('heading', { name: 'Edit Multi-Trainer Questions' })).toBeVisible();
     });
 
-    test('EDIT-001: should display the list of questions on page load', async ({ page }) => {
+    test('Verify the list of questions on page load is displayed', async ({ page }) => {
         const firstQuestionInput = page.locator('#question-0');
         const lastQuestionInput = page.locator('#question-3'); 
 
@@ -309,7 +295,7 @@ test.describe('Edit Questions Page', () => {
         await expect(firstQuestionInput).toHaveValue('Adequat oppotunities to clarify concepts');
     });
 
-    test('EDIT-002: should allow editing the text of a question', async ({ page }) => {
+    test('Verify editing the text of a question is allowed', async ({ page }) => {
         const questionInput = page.locator('#question-1');
         const newText = 'Was the pace of the training appropriate?';
         
@@ -335,7 +321,9 @@ test.describe('Edit Questions Page', () => {
     //     await expect(statusMessage).toContainText('Questions saved successfully!');
     // });
 
-    test.skip('Should show a success message after saving changes', async ({ page }) => {
+
+    //only works in debug mode
+    test.skip('Verify a success message is shown after saving changes', async ({ page }) => {
         const saveButton = page.getByRole('button', { name: 'Save Changes' });
 
         const statusMessage = page.locator('#saveStatus');
@@ -347,7 +335,7 @@ test.describe('Edit Questions Page', () => {
 
 
 
-    test('Should persist changes after saving and reloading', async ({ page }) => {
+    test('Verify changes persist after saving and reloading', async ({ page }) => {
         const questionInput = page.locator('#question-2');
         const persistedText = `New persisted text ${Date.now()}`;
 
@@ -357,19 +345,18 @@ test.describe('Edit Questions Page', () => {
         await expect(page.locator('#saveStatus')).toBeVisible(); 
 
         await page.reload();
-
         await expect(page.getByRole('heading', { name: 'Edit Multi-Trainer Questions' })).toBeVisible();
         await expect(questionInput).toHaveValue(persistedText);
     });
 
-    test('Should navigate back to dashboard from sidebar', async ({ page }) => {
+    test('Verify navigating back to dashboard from sidebar is possible', async ({ page }) => {
         await page.getByRole('link', { name: '📊 Dashboard' }).click();
 
         await expect(page).toHaveURL(/index1.html/);
         await expect(page.getByRole('heading', { name: 'Training Feedback Analyzer' })).toBeVisible();
     });
 
-    test.skip('Should be able to logout from Edit questions page', async ({ page }) => {
+    test.skip('Verify logout from Edit questions page is possible', async ({ page }) => {
         await page.getByRole('link', { name: 'Logout' }).click();
 
         await expect(page).toHaveURL(/index1.html/);
