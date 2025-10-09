@@ -184,3 +184,8 @@ This suite tests the primary user journey on the main dashboard page.
 This suite covers the core functionality of your dashboard. When you're ready, say **"next"** for the final suite of test cases focusing on the **Edit Questions Page**.
 
 ```
+
+
+1. Log in.
+2. Navigate to Edit Questions Page. 
+3. Click on Dashboard	

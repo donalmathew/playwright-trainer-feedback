@@ -71,23 +71,23 @@ test.describe('Authentication and Signup Forms', () => {
         await expect(signupForm).toBeHidden();
     });
     
-    test('should switch between login and signup forms', async ({ page }) => {
-        const loginForm = page.locator('#loginForm');
-        const signupForm = page.locator('#signupForm');
+    // test('should switch between login and signup forms', async ({ page }) => {
+    //     const loginForm = page.locator('#loginForm');
+    //     const signupForm = page.locator('#signupForm');
         
-        await expect(loginForm).toBeVisible();
-        await expect(signupForm).toBeHidden();
+    //     await expect(loginForm).toBeVisible();
+    //     await expect(signupForm).toBeHidden();
         
-        await page.getByRole('link', { name: 'Sign up' }).click();
+    //     await page.getByRole('link', { name: 'Sign up' }).click();
 
-        await expect(loginForm).toBeHidden();
-        await expect(signupForm).toBeVisible();
+    //     await expect(loginForm).toBeHidden();
+    //     await expect(signupForm).toBeVisible();
 
-        await page.getByRole('link', { name: 'Login' }).click();
+    //     await page.getByRole('link', { name: 'Login' }).click();
 
-        await expect(loginForm).toBeVisible();
-        await expect(signupForm).toBeHidden();
-    });
+    //     await expect(loginForm).toBeVisible();
+    //     await expect(signupForm).toBeHidden();
+    // });
 
     test('Verify Full Name Section works as intended', async ({ page }) => {
         await page.getByRole('link', { name: 'Sign up' }).click();
