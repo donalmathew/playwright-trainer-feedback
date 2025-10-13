@@ -8,7 +8,7 @@ test.describe('Authentication and Signup Forms', () => {
     });
 
     
-    test('Test the Login Functionality in Banking', async ({ page }) => {
+    test('Test the Login Functionality', async ({ page }) => {
         const loginForm = page.locator('#loginForm');
         await loginForm.getByPlaceholder('Username').fill('donalmathewpt@gmail.com');
         await loginForm.getByPlaceholder('Password').fill('333333');
