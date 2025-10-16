@@ -1,0 +1,108 @@
+import { test, expect } from '@playwright/test';
+import * as path from 'path';
+
+test.describe('API Mocking - Firebase Authentication', () => {
+  test.beforeEach(async ({ page }) => {
+    // Clear session storage before each test
+    await page.goto('http://127.0.0.1:5501/index1.html');
+    await page.evaluate(() => sessionStorage.clear());
+  });
+
+  test('Mock failed login API response - wrong password', async ({ page }) => {
+    // Mock failed authentication
+    await page.route('**/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword*', async (route) => {
+      await route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          error: {
+            code: 400,
+            message: 'INVALID_PASSWORD',
+            errors: [{
+              message: 'INVALID_PASSWORD',
+              domain: 'global',
+              reason: 'invalid'
+            }]
+          }
+        })
+      });
+    });
+
+    await page.waitForLoadState('domcontentloaded');
+
+    const loginForm = page.locator('#loginForm');
+    await loginForm.getByPlaceholder('Username').fill('donalmathewpt@gmail.com');
+    await loginForm.getByPlaceholder('Password').fill('333333');
+    
+    // Listen for alert dialog
+    page.once('dialog', async dialog => {
+      expect(dialog.message()).toContain('Invalid credentials');
+      await dialog.accept();
+    });
+
+    await loginForm.getByRole('button', { name: 'Login' }).click();
+    
+    // Wait a bit to ensure the alert was triggered
+    await page.waitForTimeout(1000);
+    
+    // Verify user is still on login page
+    await expect(page.locator('.login-container')).toBeVisible();
+    await expect(page.locator('#mainApp')).toBeHidden();
+  });
+
+
+  test.only('Mock successful login API response', async ({ page }) => {
+  // Mock Firebase signIn endpoint
+  await page.route('**/identitytoolkit.googleapis.com/**/accounts:signInWithPassword**', async (route) => {
+    console.log('Intercepted:', route.request().url());
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        kind: 'identitytoolkit#VerifyPasswordResponse',
+        localId: 'mock-user-id-123',
+        email: 'test@example.com',
+        displayName: 'Test User',
+        idToken: 'mock-id-token-xyz',
+        registered: true,
+        refreshToken: 'mock-refresh-token',
+        expiresIn: '3600'
+      })
+    });
+  });
+
+  // Mock Firebase lookup endpoint
+  await page.route('**/identitytoolkit.googleapis.com/**/accounts:lookup**', async (route) => {
+    console.log('Intercepted:', route.request().url());
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        kind: 'identitytoolkit#GetAccountInfoResponse',
+        users: [{
+          localId: 'mock-user-id-123',
+          email: 'test@example.com',
+          displayName: 'Test User',
+          emailVerified: true
+        }]
+      })
+    });
+  });
+
+  await page.waitForLoadState('domcontentloaded');
+
+  const loginForm = page.locator('#loginForm');
+  await loginForm.getByPlaceholder('Username').fill('test@example.com');
+  await loginForm.getByPlaceholder('Password').fill('password123');
+
+  await Promise.all([
+    page.waitForFunction(() => sessionStorage.getItem('isLoggedIn') === 'true', { timeout: 10000 }),
+    loginForm.getByRole('button', { name: 'Login' }).click()
+  ]);
+
+  await expect(page.locator('#mainApp')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('.login-container')).toBeHidden();
+});
+
+
+});

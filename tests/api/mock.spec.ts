@@ -29,12 +29,11 @@ await page.route(`**/${databaseURL}/questions/multiTrainer.json`, async route =>
 });
 
 // --- Step 2: Navigate to the application and log in ---
-await page.goto('/index1.html'); // Ensure your local server is running
-
-// **CORRECTED**: Use the new login credentials
-await page.getByPlaceholder('Username').fill('donalmathewpt@gmail.com');
-await page.getByPlaceholder('Password').fill('333333');
-await page.getByRole('button', { name: 'Login' }).click();
+await page.goto('http://127.0.0.1:5501/index1.html');
+const loginForm = page.locator('#loginForm');
+await loginForm.getByPlaceholder('Username').fill('donalmathewpt@gmail.com');
+await loginForm.getByPlaceholder('Password').fill('333333');
+await loginForm.getByRole('button', { name: 'Login' }).click();
 
 // Wait for the main application to appear to confirm a successful login
 await expect(page.locator('#mainApp')).toBeVisible();
