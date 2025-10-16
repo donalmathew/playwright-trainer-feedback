@@ -1,0 +1,76 @@
+import {test,expect} from '@playwright/test'
+
+test.beforeEach(async ({page})=>{
+    await page.goto('http://127.0.0.1:5501/index1.html');
+})
+
+test('login failure', async({page})=>{
+    const loginForm = page.locator('#loginForm');
+    await loginForm.getByPlaceholder('Username').fill('donalmathewpt@gmail.com');
+    await loginForm.getByPlaceholder('Password').fill('333333');
+    await loginForm.getByRole('button', { name: 'Login' }).click();
+
+    await page.route('*/**/accounts:signInWithPassword*', async route=>{
+        const responseBody={
+            "error": {
+                "code": 400,
+                "message": "INVALID_LOGIN_CREDENTIALS",
+                "errors": [
+                {
+                    "message": "INVALID_LOGIN_CREDENTIALS",
+                    "domain": "global",
+                    "reason": "invalid"
+                }
+                ]
+            }
+        }
+        await route.fulfill({
+            body: JSON.stringify(responseBody)
+        })
+    })
+    await page.goto('http://127.0.0.1:5501/index1.html');
+})
+
+// test('login success', async({page})=>{
+//     await page.route('*/**/accounts:signInWithPassword*', async route=>{
+//         const responseBody={
+//             "kind": "identitytoolkit#VerifyPasswordResponse",
+//             "localId": "vznbWmCqmMM7ihmrtzPJgla6LTh1",
+//             "email": "donalmathewpt@gmail.com",
+//             "displayName": "",
+//             "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImE1YTAwNWU5N2NiMWU0MjczMDBlNTJjZGQ1MGYwYjM2Y2Q4MDYyOWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vanMtcHJvamVjdC1mMjJlMyIsImF1ZCI6ImpzLXByb2plY3QtZjIyZTMiLCJhdXRoX3RpbWUiOjE3NjA1OTIxMDcsInVzZXJfaWQiOiJ2em5iV21DcW1NTTdpaG1ydHpQSmdsYTZMVGgxIiwic3ViIjoidnpuYldtQ3FtTU03aWhtcnR6UEpnbGE2TFRoMSIsImlhdCI6MTc2MDU5MjEwNywiZXhwIjoxNzYwNTk1NzA3LCJlbWFpbCI6ImRvbmFsbWF0aGV3cHRAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImRvbmFsbWF0aGV3cHRAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.TCaDKPlus4ydbjIumehDuAvHZqM0Ald_09K_LFzx-jLFJQzIycrXRCIv629zDv8Vh_BRyc4H-Bm9WST2bTH8iPHDvUlD6Mth8XZGHooKk4jcB58htV0vGG7I0m-kU6icoyqNc7lBepJWiI_ttokMTHJC5HV9Dcr6D9GxZ1KbaALGudWE_MVQd9FYw7P2Q9J8oEoj50G4lRDCVjFA9fc-Ljjwb-mBp774_cemGc8d-35xda4sq4ncvOiwWGms3wn8TCQfXsCAUADTcTQD1OY76AceebxCb5igBWZzGXPO2gWwFlNw6rp-OXOw3UbUBBgmKb9fJQfidIEAyWKEaqX-Kw",
+//             "registered": true,
+//             "refreshToken": "AMf-vBxqZbqgf9u0eaAItZBi0wA6t2LK2Fez4Z1rnGTquMGXbwexFpZbzZwrwZoJjV0U4JR2Pq_-K_pmTlZHkdEp_985mBigkNyJ6PsBzM13mRRafeyCCDOdRdrqjCTs6BBJkWJvfWCddqEyfgK-lA2A3K94__R62ZBW8EzjCUJ06unh9gF6ywhAvbYXOBTlVMMbLK3k8PJ33LQyMng_j6QZmJRURHekYA",
+//             "expiresIn": "3600"
+//         }
+//         await route.fulfill({
+//             body: JSON.stringify(responseBody)
+//         })
+//     })
+//     await page.goto('http://127.0.0.1:5501/index1.html');
+// })
+
+// {
+//   "error": {
+//     "code": 400,
+//     "message": "INVALID_LOGIN_CREDENTIALS",
+//     "errors": [
+//       {
+//         "message": "INVALID_LOGIN_CREDENTIALS",
+//         "domain": "global",
+//         "reason": "invalid"
+//       }
+//     ]
+//   }
+// }
+
+// {
+//     "kind": "identitytoolkit#VerifyPasswordResponse",
+//     "localId": "vznbWmCqmMM7ihmrtzPJgla6LTh1",
+//     "email": "donalmathewpt@gmail.com",
+//     "displayName": "",
+//     "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImE1YTAwNWU5N2NiMWU0MjczMDBlNTJjZGQ1MGYwYjM2Y2Q4MDYyOWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vanMtcHJvamVjdC1mMjJlMyIsImF1ZCI6ImpzLXByb2plY3QtZjIyZTMiLCJhdXRoX3RpbWUiOjE3NjA1OTIxMDcsInVzZXJfaWQiOiJ2em5iV21DcW1NTTdpaG1ydHpQSmdsYTZMVGgxIiwic3ViIjoidnpuYldtQ3FtTU03aWhtcnR6UEpnbGE2TFRoMSIsImlhdCI6MTc2MDU5MjEwNywiZXhwIjoxNzYwNTk1NzA3LCJlbWFpbCI6ImRvbmFsbWF0aGV3cHRAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImRvbmFsbWF0aGV3cHRAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.TCaDKPlus4ydbjIumehDuAvHZqM0Ald_09K_LFzx-jLFJQzIycrXRCIv629zDv8Vh_BRyc4H-Bm9WST2bTH8iPHDvUlD6Mth8XZGHooKk4jcB58htV0vGG7I0m-kU6icoyqNc7lBepJWiI_ttokMTHJC5HV9Dcr6D9GxZ1KbaALGudWE_MVQd9FYw7P2Q9J8oEoj50G4lRDCVjFA9fc-Ljjwb-mBp774_cemGc8d-35xda4sq4ncvOiwWGms3wn8TCQfXsCAUADTcTQD1OY76AceebxCb5igBWZzGXPO2gWwFlNw6rp-OXOw3UbUBBgmKb9fJQfidIEAyWKEaqX-Kw",
+//     "registered": true,
+//     "refreshToken": "AMf-vBxqZbqgf9u0eaAItZBi0wA6t2LK2Fez4Z1rnGTquMGXbwexFpZbzZwrwZoJjV0U4JR2Pq_-K_pmTlZHkdEp_985mBigkNyJ6PsBzM13mRRafeyCCDOdRdrqjCTs6BBJkWJvfWCddqEyfgK-lA2A3K94__R62ZBW8EzjCUJ06unh9gF6ywhAvbYXOBTlVMMbLK3k8PJ33LQyMng_j6QZmJRURHekYA",
+//     "expiresIn": "3600"
+// }
