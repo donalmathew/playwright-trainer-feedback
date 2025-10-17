@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test';
-import * as path from 'path';
 
 test.describe('API Mocking - Network Interception', () => {
   test.beforeEach(async ({ page }) => {
-    // Clear session storage before each test
+    // To Clear session storage before each test
     await page.goto('http://127.0.0.1:5501/index1.html');
     await page.evaluate(() => sessionStorage.clear());
   });
